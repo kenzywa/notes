@@ -32,10 +32,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     @objc func addNote() {
         let alert = UIAlertController(title: "Новая заметка", message: .none, preferredStyle: .alert)
         alert.addTextField { (textField ) in
-            textField.keyboardType = .alphabet
+            textField.keyboardType = .default
             textField.placeholder = "Введите текст новой заметки"
         }
-        alert.addAction(UIAlertAction(title: "Добавить", style: .default, handler: { [weak alert] (_) in
+       alert.addAction(UIAlertAction(title: "Добавить", style: .default, handler: { [weak alert] (_) in
+       
             //let textField = alert?.title
             //let textField = addTextField.text
             //print(textField)
