@@ -33,7 +33,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let alert = UIAlertController(title: "Новая заметка", message: .none, preferredStyle: .alert)
         alert.addTextField { (textField ) in
             textField.keyboardType = .default
-            textField.placeholder = "Введите текст новой заметки"
+            textField.placeholder = "Введите текст новой заметки!"
         }
        alert.addAction(UIAlertAction(title: "Добавить", style: .default, handler: { [weak alert] (_) in
        
