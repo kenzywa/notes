@@ -1,7 +1,7 @@
 import Foundation
 
 struct Notes {
-    var titleOfNote : String
+    var noteTitle : String
     let id : String
 }
 
