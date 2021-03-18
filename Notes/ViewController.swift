@@ -13,7 +13,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     override func viewDidLoad() {
         super.viewDidLoad()
-        firstTableView.backgroundColor = .systemFill
+        //firstTableView.backgroundColor = .systemFill
         self.view.backgroundColor = .systemBackground
         self.title = "Ваши заметки"
         createTable()
