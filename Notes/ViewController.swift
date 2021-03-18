@@ -17,9 +17,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.view.backgroundColor = .systemBackground
         self.title = "Ваши заметки"
         createTable()
-        
         view.addSubview(firstTableView)
-        
         let addButton = UIBarButtonItem(barButtonSystemItem: .add,
                                         target: self,
                                         action: #selector(addNote))
@@ -56,11 +54,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                                                          isCompleted : false)
                                         self.notes.append(note)
                                         self.saveData()
-                                        
-                                        
                                       }))
         present(alert, animated: true, completion: nil)
     }
+    
     func changeState(at item : Int) -> Bool {
         notes[item].isCompleted = !(notes[item].isCompleted)
         return notes[item].isCompleted
@@ -87,12 +84,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notes.count
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         let thenotes = notes[indexPath.row]
         cell.textLabel?.text = thenotes.noteTitle
         
-        if thenotes.isCompleted == true {
+        if thenotes.isCompleted {
             cell.accessoryType = .checkmark
             
         } else {
@@ -107,7 +105,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration?
     {
-        let editAction = UIContextualAction(style: .normal, title: "Изменить") { (action, view, handler) in
+        let editAction = UIContextualAction(style: .normal,
+                                            title: "Изменить") { (action, view, handler) in
             let alert = UIAlertController(title: "Редактирование заметки",
                                           message: .none,
                                           preferredStyle: .alert)
