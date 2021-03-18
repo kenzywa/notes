@@ -65,11 +65,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         notes[item].isCompleted = !(notes[item].isCompleted)
         return notes[item].isCompleted
     }
+    
     func saveData() {
         if let encoded = try? JSONEncoder().encode(notes) {
             UserDefaults.standard.setValue(encoded, forKey: "NotesKeys")
         }
-  }
+    }
     
     func loadData() {
         guard let notesData = UserDefaults.standard.value(forKey: "NotesKeys") as? Data else {
@@ -83,7 +84,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
     }
     //MARK: - UITableViewDataSource
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notes.count
     }
@@ -105,11 +105,31 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return true
     }
 
-    
     func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration?
     {
         let editAction = UIContextualAction(style: .normal, title: "Изменить") { (action, view, handler) in
-            
+            let alert = UIAlertController(title: "Редактирование заметки",
+                                          message: .none,
+                                          preferredStyle: .alert)
+            alert.addTextField { textField in
+                textField.keyboardType = .default
+                textField.placeholder = ""
+            }
+            alert.addAction(UIAlertAction(title: "Изменить",
+                                          style: .default,
+                                          handler: { [weak self] _ in
+                                            guard let self = self,
+                                                  let textField = alert.textFields?.first,
+                                                  let text = textField.text else {
+                                                return
+                                            }
+                                            let newnote = Notes(noteTitle: text,
+                                                             id: UUID().uuidString,
+                                                             isCompleted : false)
+                                            self.notes[indexPath.row] = newnote
+                                            self.saveData()
+                                          }))
+            self.present(alert, animated: true, completion: nil)
         }
         editAction.backgroundColor = .systemGreen
         let configuration = UISwipeActionsConfiguration(actions: [editAction])
@@ -126,8 +146,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
         return configuration
     }
-        
-        
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         firstTableView.deselectRow(at: indexPath, animated: true)
         
@@ -138,8 +157,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
             firstTableView.cellForRow(at: indexPath)?.accessoryType = .none
         }
     }
-    
-    
     //MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80.0
