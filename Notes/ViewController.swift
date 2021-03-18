@@ -35,12 +35,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     @objc func addNote() {
         let alert = UIAlertController(title: "Новая заметка",
-                                      message: .none,
+                                      message: "Введите текст новой заметки",
                                       preferredStyle: .alert)
         alert.addTextField { textField in
             textField.keyboardType = .default
-            textField.placeholder = "Введите текст новой заметки!"
+            textField.placeholder = "Новая заметка"
         }
+        alert.addAction(UIAlertAction(title: "Отменить",
+                                      style: .cancel,
+                                      handler: { _ in
+                                        return
+                                      }))
         alert.addAction(UIAlertAction(title: "Добавить",
                                       style: .default,
                                       handler: { [weak self] _ in
@@ -90,7 +95,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let thenotes = notes[indexPath.row]
         cell.textLabel?.text = thenotes.noteTitle
         
-        if thenotes.isCompleted {
+        if thenotes.isCompleted == true {
             cell.accessoryType = .checkmark
             
         } else {
@@ -108,12 +113,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let editAction = UIContextualAction(style: .normal,
                                             title: "Изменить") { (action, view, handler) in
             let alert = UIAlertController(title: "Редактирование заметки",
-                                          message: .none,
+                                          message: "Введите текст заметки",
                                           preferredStyle: .alert)
             alert.addTextField { textField in
                 textField.keyboardType = .default
-                textField.placeholder = ""
+                textField.placeholder = self.notes[indexPath.row].noteTitle
             }
+            alert.addAction(UIAlertAction(title: "Отменить",
+                                          style: .cancel,
+                                          handler: { _ in
+                                            return
+                                          }))
             alert.addAction(UIAlertAction(title: "Изменить",
                                           style: .default,
                                           handler: { [weak self] _ in
@@ -149,12 +159,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         firstTableView.deselectRow(at: indexPath, animated: true)
         
-        if changeState(at: indexPath.row) == true {
+        if (changeState(at: indexPath.row) == true) {
             firstTableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
             
         } else {
             firstTableView.cellForRow(at: indexPath)?.accessoryType = .none
         }
+        saveData()
     }
     //MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
