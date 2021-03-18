@@ -9,6 +9,7 @@ var window: UIWindow?
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = UINavigationController(rootViewController:   ViewController())
         window?.makeKeyAndVisible()
+        (window?.rootViewController as? ViewController)?.loadData()
         return true
     }
 }

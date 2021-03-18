@@ -1,10 +1,12 @@
 import UIKit
 
 class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    var firstTableView = UITableView(frame: .zero, style: .plain)
+    var firstTableView = UITableView(frame: .zero,
+                                     style: .plain)
     var identifier = "MyCell"
-    var notes = [Notes(noteTitle: "Помыть машину", id : UUID().uuidString),
-                 Notes(noteTitle: "Сходить в магазин", id: UUID().uuidString)] {
+    var notes = [Notes(noteTitle: "Зайти в приложение с заметками",
+                       id : UUID().uuidString,
+                       isCompleted : true)] {
         didSet {
             firstTableView.reloadData()
         }
@@ -15,10 +17,14 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         self.view.backgroundColor = .systemBackground
         self.title = "Ваши заметки"
         createTable()
+        
         view.addSubview(firstTableView)
         
-        let addButton = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNote))
+        let addButton = UIBarButtonItem(barButtonSystemItem: .add,
+                                        target: self,
+                                        action: #selector(addNote))
         navigationItem.leftBarButtonItem = addButton
+        loadData()
     }
     //MARK: - Functions
     func createTable() {
@@ -45,11 +51,36 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
                                               let text = textField.text else {
                                             return
                                         }
-                                        let note = Notes(noteTitle: text, id: UUID().uuidString)
+                                        let note = Notes(noteTitle: text,
+                                                         id: UUID().uuidString,
+                                                         isCompleted : false)
                                         self.notes.append(note)
-
+                                        self.saveData()
+                                        
+                                        
                                       }))
         present(alert, animated: true, completion: nil)
+    }
+    func changeState(at item : Int) -> Bool {
+        notes[item].isCompleted = !(notes[item].isCompleted)
+        return notes[item].isCompleted
+    }
+    func saveData() {
+        if let encoded = try? JSONEncoder().encode(notes) {
+            UserDefaults.standard.setValue(encoded, forKey: "NotesKeys")
+        }
+  }
+    
+    func loadData() {
+        guard let notesData = UserDefaults.standard.value(forKey: "NotesKeys") as? Data else {
+            return
+        }
+        
+        guard let notes = try? JSONDecoder().decode([Notes].self, from: notesData) else {
+            return
+        }
+        self.notes = notes
+        
     }
     //MARK: - UITableViewDataSource
     
@@ -60,23 +91,55 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath)
         let thenotes = notes[indexPath.row]
         cell.textLabel?.text = thenotes.noteTitle
+        
+        if thenotes.isCompleted == true {
+            cell.accessoryType = .checkmark
+            
+        } else {
+            cell.accessoryType = .none
+        }
         return cell
     }
-    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool
-    {
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return true
     }
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath)
+
+    
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration?
     {
-        if editingStyle == .delete
-        {
-            notes.remove(at: indexPath.row)
-            print(notes)
+        let editAction = UIContextualAction(style: .normal, title: "Изменить") { (action, view, handler) in
+            
+        }
+        editAction.backgroundColor = .systemGreen
+        let configuration = UISwipeActionsConfiguration(actions: [editAction])
+        return configuration
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration?
+    {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, handler) in
+            self?.notes.remove(at: indexPath.row)
+            self?.saveData()
+        }
+        deleteAction.backgroundColor = .red
+        let configuration = UISwipeActionsConfiguration(actions: [deleteAction])
+        return configuration
+    }
+        
+        
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        firstTableView.deselectRow(at: indexPath, animated: true)
+        
+        if changeState(at: indexPath.row) == true {
+            firstTableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            
+        } else {
+            firstTableView.cellForRow(at: indexPath)?.accessoryType = .none
         }
     }
-    func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
-        cell.backgroundColor = UIColor.clear
-    }
+    
+    
     //MARK: - UITableViewDelegate
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80.0

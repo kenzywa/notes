@@ -1,7 +1,7 @@
 import Foundation
 
-struct Notes {
+struct Notes: Codable {
     var noteTitle : String
     let id : String
+    var isCompleted : Bool
 }
-
